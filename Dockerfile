@@ -3,14 +3,14 @@
 #
 
 # Pull base image
-FROM openjdk:8u171
+FROM openjdk:11
 
 # Env variables
-ENV SCALA_VERSION 2.12.6
-ENV SBT_VERSION 1.1.6
+ENV SCALA_VERSION 2.12.13
+ENV SBT_VERSION 1.4.8
 
 # Scala expects this file
-RUN touch /usr/lib/jvm/java-8-openjdk-amd64/release
+# RUN touch /usr/lib/jvm/java-11-openjdk-amd64/release
 
 # Install Scala
 ## Piping curl directly in tar
@@ -25,6 +25,9 @@ RUN \
   apt-get update && \
   apt-get -y upgrade && \
   apt-get -y install \
+  python3 \
+  python3-distutils \
+  python3-apt \
   apt-transport-https \
   ca-certificates \
   curl \
@@ -47,7 +50,7 @@ RUN \
     sbt \
     docker-ce=$(apt-cache show docker-ce | grep 'Version:' | awk '{print $NF}' | grep "$DOCKER_VERSION" | head -n 1) && \
   rm -rf /var/lib/apt/lists/* && \
-  sbt sbtVersion
+  sbt sbtVersion -Dsbt.rootdir=true
 
 # Define working directory
 ENV HOME /root
@@ -71,7 +74,7 @@ RUN \
 	&& \
 	rm -rf /var/lib/apt/lists/* && \
 	wget -q 'https://bootstrap.pypa.io/get-pip.py' -O get-pip.py && \
-	python get-pip.py && \
+	python3 get-pip.py && \
 	rm get-pip.py && \
 	pip install \
 		kubernetes \
